@@ -36,7 +36,6 @@ from googletrans import Translator
 import base64
 import logging
 from io import BytesIO
-from playsound import playsound
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -399,7 +398,9 @@ def text_to_voice(text, language_code):
         tts = gTTS(text=text, lang=language_code, slow=False)
         temp_audio = "temp_audio.mp3"
         tts.save(temp_audio)
-        playsound(temp_audio)
+        with open(temp_audio, "rb") as audio_file:
+            audio_bytes = audio_file.read()
+            st.audio(audio_bytes, format="audio/mp3")
         os.remove(temp_audio)
     except Exception as e:
         st.write(f"⚠️ Error in text-to-voice conversion: {e}")
@@ -1530,3 +1531,4 @@ def live_video_translation(target_language, email_sender, email_address, usernam
 # Main entry point
 if __name__ == "__main__":
     main()
+
