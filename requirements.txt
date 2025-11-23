@@ -19,3 +19,4 @@ moviepy
 torch
 textblob
 transformers
+easyocr
