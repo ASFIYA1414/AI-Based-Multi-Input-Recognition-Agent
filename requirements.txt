@@ -6,7 +6,6 @@ mediapipe
 numpy
 speechrecognition
 Pillow
-pytesseract
 gTTS
 seaborn
 matplotlib
@@ -20,3 +19,4 @@ torch
 textblob
 transformers
 easyocr
+
