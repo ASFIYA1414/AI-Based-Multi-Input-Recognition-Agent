@@ -26,8 +26,6 @@ import mediapipe as mp
 import numpy as np
 import time
 import speech_recognition as sr
-from PIL import Image
-import pytesseract
 from gtts import gTTS  # Changed from pyttsx3 to gTTS for better multilingual support
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -1235,39 +1233,51 @@ def audio_to_text_from_file(audio_path, target_language, email_sender, email_add
             return None, None
 
 # Function to extract text from an image with preprocessing
+reader = easyocr.Reader(['en'], gpu=False)
 def image_to_text(image, target_language, email_sender, email_address, username):
     try:
-        # Preprocess image
-        gray_image = image.convert('L')  # Convert to grayscale
-        # Apply thresholding
-        threshold_image = gray_image.point(lambda p: p > 128 and 255)
-        text = pytesseract.image_to_string(threshold_image)
-        st.write(f"**Text extracted from image:**")
+        # Convert PIL image → NumPy array
+        img_np = np.array(image)
+
+        # OCR extraction using EasyOCR
+        result = reader.readtext(img_np, detail=0)
+        text = " ".join(result)
+
+        st.write("**Text extracted from image:**")
         st.write(text)
+
+        # Translate text
         translated_text = translate_text(text, target_language, username)
-        st.write(f"**Translated Text:**")
+        
+        st.write("**Translated Text:**")
         st.write(translated_text)
+
         # Convert text to speech
         text_to_voice(translated_text, target_language)
-        # Perform sentiment analysis
+
+        # Sentiment analysis
         sentiment_analysis(translated_text, username)
-        # Provide download option
-        if text:
+
+        # Download button
+        if translated_text:
             st.download_button(
                 label="Download Translated Text",
                 data=translated_text,
                 file_name='translated_text.txt',
                 mime='text/plain'
             )
-        # Log the image to text translation
+
+        # Logging
         log_user_action(username, "Image Text Extraction", f"Extracted Text: {text}")
+
         return text, translated_text
+
     except Exception as e:
-        st.write(f"⚠️ Error in image to text conversion: {e}")
-        logging.error(f"Error in image to text conversion: {e}")
-        # Log the error
+        st.write(f"⚠️ OCR Error: {e}")
+        logging.error(f"OCR Error: {e}")
         log_user_action(username, "Image Text Extraction Error", f"Error: {e}")
         return "", ""
+
 
 # Function to extract text from a text file and translate it
 def text_file_to_text(file, target_language, email_sender, email_address, username):
@@ -1531,4 +1541,5 @@ def live_video_translation(target_language, email_sender, email_address, usernam
 # Main entry point
 if __name__ == "__main__":
     main()
+
 
