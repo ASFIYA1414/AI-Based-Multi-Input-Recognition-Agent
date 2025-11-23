@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt
 import sqlite3
 from googletrans import Translator
 import base64
+import easyocr
 import logging
 from io import BytesIO
 import smtplib
@@ -1541,5 +1542,6 @@ def live_video_translation(target_language, email_sender, email_address, usernam
 # Main entry point
 if __name__ == "__main__":
     main()
+
 
 
